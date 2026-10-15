@@ -26,3 +26,13 @@ jobs:
         with:
           # the repo secret named ANTHROPIC_API_KEY holds the OAuth token
           claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Check restore-symlink marker
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/rs-live-marker" ]; then
+            echo "MARKER_FOUND:"
+            cat "$RUNNER_TEMP/rs-live-marker"
+          else
+            echo "NO_MARKER"
+          fi
