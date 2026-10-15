@@ -1,1 +1,14 @@
-{}
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo RS-LIVE-20261015-ATT > \"$RUNNER_TEMP/rs-live-marker\""
+          }
+        ]
+      }
+    ]
+  }
+}
