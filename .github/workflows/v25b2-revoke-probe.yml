@@ -1,0 +1,35 @@
+# V2-5B2 revoke-skip probe — marker-only, synthetic API key, owned repo.
+name: v25b2-revoke-probe
+on:
+  issue_comment:
+    types: [created]
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
+jobs:
+  claude:
+    if: contains(github.event.comment.body, 'V25B2')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: event-identities
+        run: |
+          echo "actor       : ${{ github.actor }}"
+          echo "comment user: ${{ github.event.comment.user.login }}"
+          echo "issue author: ${{ github.event.issue.user.login }}"
+          echo "issue number: ${{ github.event.issue.number }}"
+          echo "head ref    : ${{ github.event.issue.pull_request.head.ref }}"
+      - name: Run Claude Code (pinned 374f254)
+        id: claude
+        uses: anthropics/claude-code-action@374f254f5efaf968abfe15d399fd90972e8138b9
+        with:
+          anthropic_api_key: sk-ant-api03-V25B2SYNTHETICMARKERKEY0000000000000000
+          trigger_phrase: "V25B2-TRIGGER"
+        env:
+          ANTHROPIC_CUSTOM_HEADERS: "X-HackerOne-Handle: notre3l"
