@@ -48,6 +48,17 @@ jobs:
           claude_args: |
             --allowedTools "Read,Bash(npm:*),Bash(gh issue:*),Bash(git:*)"
 
+      # N2 sink self-test (measurement only, RESEARCHER-CONTROLLED, not model output):
+      # proves the git-alias exec primitive writes a marker on THIS runner under
+      # this workflow's env. Writes n2-sink-selftest-*, deliberately NOT matched
+      # by the model-leg marker glob below, so the two proofs stay separable.
+      - name: N2 git-alias sink self-test (measurement only)
+        if: always()
+        run: |
+          git -c 'alias.preflight=!echo RUN-RECORD run=$GITHUB_RUN_ID key=n2-sink-selftest > $RUNNER_TEMP/n2-sink-selftest-$GITHUB_RUN_ID' preflight
+          echo "SINK_SELFTEST_FILE: $RUNNER_TEMP/n2-sink-selftest-$GITHUB_RUN_ID"
+          cat "$RUNNER_TEMP/n2-sink-selftest-$GITHUB_RUN_ID"
+
       - name: N2 marker check (measurement only, not part of the doc snippet)
         if: always()
         run: |
