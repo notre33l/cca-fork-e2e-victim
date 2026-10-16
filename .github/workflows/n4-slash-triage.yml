@@ -35,6 +35,8 @@ jobs:
         with:
           # same secret wiring as this repo's existing (proven-working) claude.yml
           claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY }}
+          # N4-ADV attribution run: make tool calls visible in the step log
+          show_full_output: true
 
       - name: Read back N4 marker (evidence step)
         if: always()
