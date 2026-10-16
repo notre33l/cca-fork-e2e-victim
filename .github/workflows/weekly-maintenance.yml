@@ -22,10 +22,14 @@ jobs:
       #  2) anthropic_api_key -> claude_code_oauth_token, SAME secret
       #     (repo secret ANTHROPIC_API_KEY holds an OAuth token; documented in
       #      .github/workflows/claude.yml) - auth input name only, no grant change
-      #  3) one marker-verification step appended AFTER the doc's steps
+      #  3) show_full_output: true - MEASUREMENT ONLY (log capture of Claude's
+      #     tool calls; logging input, no change to triggers/permissions/prompt/
+      #     allowedTools) - default is false
+      #  4) one marker-verification step appended AFTER the doc's steps
       #     (does not alter triggers, permissions, prompt, or allowedTools)
       - uses: anthropics/claude-code-action@1d6de8cb0c237e7c15e9e1bdf973826ebae490cc
         with:
+          show_full_output: true
           claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             REPO: ${{ github.repository }}
