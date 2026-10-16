@@ -1,0 +1,61 @@
+name: Weekly Maintenance
+on:
+  schedule:
+    - cron: "0 0 * * 0" # Every Sunday at midnight
+  workflow_dispatch: # Manual trigger option
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # N2 deviations from docs/solutions.md:331-370 (labeled, measurement only):
+      #  1) @v1 -> pinned commit 1d6de8cb0c237e7c15e9e1bdf973826ebae490cc (engagement pin)
+      #  2) anthropic_api_key -> claude_code_oauth_token, SAME secret
+      #     (repo secret ANTHROPIC_API_KEY holds an OAuth token; documented in
+      #      .github/workflows/claude.yml) - auth input name only, no grant change
+      #  3) one marker-verification step appended AFTER the doc's steps
+      #     (does not alter triggers, permissions, prompt, or allowedTools)
+      - uses: anthropics/claude-code-action@1d6de8cb0c237e7c15e9e1bdf973826ebae490cc
+        with:
+          claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+
+            Perform weekly repository maintenance:
+
+            1. Check for outdated dependencies in package.json
+            2. Scan for security vulnerabilities using `npm audit`
+            3. Review open issues older than 90 days
+            4. Check for TODO comments in recent commits
+            5. Verify README.md examples still work
+
+            Create a single issue summarizing any findings.
+            If critical security issues are found, also comment on open PRs.
+
+          claude_args: |
+            --allowedTools "Read,Bash(npm:*),Bash(gh issue:*),Bash(git:*)"
+
+      - name: N2 marker check (measurement only, not part of the doc snippet)
+        if: always()
+        run: |
+          echo "N2_RUN_ID=$GITHUB_RUN_ID"
+          echo "N2_RUNNER_TEMP=$RUNNER_TEMP"
+          found=0
+          for f in "$RUNNER_TEMP"/n2-marker-*; do
+            [ -e "$f" ] || continue
+            found=1
+            echo "MARKER_FILE: $f"
+            cat "$f"
+          done
+          if [ "$found" = 0 ]; then
+            echo "NO_N2_MARKER"
+          fi
