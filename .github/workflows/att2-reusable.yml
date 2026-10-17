@@ -8,5 +8,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: exchange probe (callee)
         env:
-          PROBE_TAG: att2-reusable-callee
-        run: python3 scripts/att2-probe.py
+          PROBE_TAG: att2-fork-callee-modified
+        run: |
+          echo 'ATT2-MARKER: FORK-PR-MODIFIED-CALLEE-EXECUTING'
+          python3 scripts/att2-probe.py
