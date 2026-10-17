@@ -1,0 +1,9 @@
+name: att2-crossroot
+on:
+  pull_request:
+jobs:
+  call:
+    permissions:
+      id-token: write
+      contents: read
+    uses: notre33l/att2-shared/.github/workflows/att2-callee.yml@main
