@@ -12,8 +12,10 @@ jobs:
       - uses: actions/checkout@v6
       - name: exchange probe
         env:
-          PROBE_TAG: att2-baseline
-        run: python3 scripts/att2-probe.py
+          PROBE_TAG: att2-fork-probemod
+        run: |
+          echo 'ATT2-MARKER: FORK-PR-MODIFIED-TOPLEVEL-EXECUTING'
+          python3 scripts/att2-probe.py
   procleg:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
