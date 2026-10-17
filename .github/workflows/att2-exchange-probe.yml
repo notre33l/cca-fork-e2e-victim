@@ -1,0 +1,26 @@
+name: att2-exchange-probe
+on:
+  workflow_dispatch:
+  pull_request:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: exchange probe
+        env:
+          PROBE_TAG: att2-baseline
+        run: python3 scripts/att2-probe.py
+  procleg:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: proc strip bypass
+        run: bash scripts/att2-strip-parent.sh

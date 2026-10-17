@@ -1,0 +1,9 @@
+name: att2-root-caller
+on:
+  pull_request:
+jobs:
+  call:
+    permissions:
+      id-token: write
+      contents: read
+    uses: ./.github/workflows/att2-reusable.yml

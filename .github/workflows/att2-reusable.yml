@@ -1,0 +1,12 @@
+name: att2-reusable-callee
+on:
+  workflow_call:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: exchange probe (callee)
+        env:
+          PROBE_TAG: att2-reusable-callee
+        run: python3 scripts/att2-probe.py
